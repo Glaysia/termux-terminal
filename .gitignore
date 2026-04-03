@@ -3,6 +3,7 @@ dist/
 coverage/
 *.log
 .DS_Store
+target/
 
 packages/*/dist/
 packages/*/node_modules/

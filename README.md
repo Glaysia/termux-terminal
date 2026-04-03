@@ -1,64 +1,78 @@
 # obsidian-termux
 
-`obsidian-termux`는 Android용 Obsidian 안에서 `Termux` 세션을 자연스럽게 붙여 쓰기 위한 프로젝트다.
-초기 단계에서는 구현보다 구조를 먼저 고정한다. 현재 저장소는 `pnpm workspaces` 기반 TypeScript 모노레포 골격만 제공한다.
+`obsidian-termux` is a mixed-language repository for an Android Obsidian plugin and a small local bridge process for `Termux`.
 
-## 목표
+Supporting design docs live in [`docs/architecture.md`](docs/architecture.md) and [`docs/protocol.md`](docs/protocol.md).
 
-- Android Obsidian에서 앱 내부 pane/view 형태의 터미널 UX를 제공한다.
-- `Termux` 측 로컬 브리지 프로세스와 연결하는 구조를 전제로 한다.
-- 웹 터미널을 단순 임베드하는 대신 Obsidian UI에 통합된 경험을 지향한다.
-
-## 아키텍처 방향
+The project is split by runtime responsibility:
 
 - `packages/obsidian-plugin`
-  - Obsidian 플러그인 패키지
-  - 모바일 UI 통합, 뷰 수명주기, 설정, 세션 attach 진입점을 담당
-- `packages/termux-bridge`
-  - Termux 측 브리지 패키지
-  - 향후 `localhost:11557` 계열 엔드포인트에서 세션 접근을 중계하는 역할
+  - TypeScript-based Obsidian plugin
+  - owns mobile UI integration, views, settings, and bridge connection lifecycle
+- `crates/termux-bridge`
+  - Rust-based local bridge process intended to run in `Termux`
+  - owns local socket serving, session attach, stream forwarding, and process/runtime concerns
 
-예정된 방향:
+## Why This Structure
 
-- 통신: WebSocket 기반 브리지 모델
-- 터미널 렌더링: `xterm.js` 계열 우선 검토
+- The Obsidian side naturally fits the plugin ecosystem and stays in TypeScript.
+- The bridge side should stay small, low-overhead, and runtime-efficient on Android.
+- Keeping both in one repository makes protocol and architecture work easier without forcing the bridge into a Node.js runtime.
 
-아직 구현하지 않은 것:
+## Current Status
 
-- 실제 WebSocket 서버
-- TTY attach/resize/reconnect 로직
-- xterm 통합
-- Obsidian 뷰/탭 UX 완성
+This repository currently contains only the project skeleton.
 
-## 왜 모노레포인가
+Implemented:
 
-- 플러그인과 브리지는 책임이 다르지만, 같은 제품 아키텍처 안에서 함께 진화한다.
-- 프로토콜, 문서, 타입, 개발 흐름을 한 저장소에서 맞추기 쉽다.
-- 초기에는 기능보다 경계 정의가 중요하므로, 패키지 분리가 먼저다.
+- root repository layout
+- `pnpm` workspace for the Obsidian plugin
+- Rust crate skeleton for the Termux bridge
+- minimal plugin entrypoint and manifest
 
-## 패키지 구성
+Not implemented yet:
+
+- actual WebSocket bridge
+- shell/session handling
+- terminal rendering integration
+- protocol definition beyond repository structure
+
+## Design Docs
+
+- [`docs/architecture.md`](docs/architecture.md): component boundaries, runtime responsibilities, and data flow
+- [`docs/protocol.md`](docs/protocol.md): draft connection model and message shapes between plugin and bridge
+
+## Repository Layout
 
 ```text
 .
-├─ packages/
-│  ├─ obsidian-plugin/
+├─ crates/
 │  └─ termux-bridge/
+├─ packages/
+│  └─ obsidian-plugin/
 ├─ package.json
 ├─ pnpm-workspace.yaml
-└─ tsconfig.base.json
+└─ Cargo.toml
 ```
 
-## 시작
+## Tooling
+
+- JavaScript workspace: `pnpm`
+- plugin language: TypeScript
+- bridge language: Rust
+
+## Getting Started
+
+Plugin side:
 
 ```bash
 corepack enable
 corepack pnpm install
-corepack pnpm build
-corepack pnpm typecheck
+corepack pnpm --filter @obsidian-termux/obsidian-plugin build
 ```
 
-## 다음 단계
+Bridge side:
 
-1. `obsidian-plugin`에 실제 커스텀 view와 설정 UI를 추가한다.
-2. `termux-bridge`에 최소 헬스체크 및 세션 브리지 서버를 구현한다.
-3. 플러그인과 브리지 사이의 연결 계약을 명시적인 프로토콜로 고정한다.
+```bash
+cargo build -p termux-bridge
+```
