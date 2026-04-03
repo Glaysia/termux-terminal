@@ -1,0 +1,17 @@
+{
+  "name": "@obsidian-termux/obsidian-plugin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "obsidian": "^1.8.10"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.9"
+  }
+}
