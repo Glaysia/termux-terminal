@@ -6,6 +6,8 @@ This document describes the first draft of the plugin-to-bridge contract. It is 
 
 The transport is expected to be a local WebSocket connection to `127.0.0.1:11557`.
 
+The current deployment assumption is that the bridge is distributed as a single `aarch64-unknown-linux-musl` binary so the same artifact can be launched both in native Termux and inside Debian `proot`.
+
 ## Connection Model
 
 - the Obsidian plugin is the client

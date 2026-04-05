@@ -8,7 +8,9 @@
     "typecheck": "pnpm --filter @obsidian-termux/obsidian-plugin typecheck",
     "build:plugin": "pnpm --filter @obsidian-termux/obsidian-plugin build",
     "typecheck:plugin": "pnpm --filter @obsidian-termux/obsidian-plugin typecheck",
-    "build:bridge": "cargo build -p termux-bridge"
+    "build:bridge": "cargo build -p termux-bridge",
+    "build:bridge:musl": "cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release",
+    "check:bridge:musl": "cargo check -p termux-bridge --target aarch64-unknown-linux-musl"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

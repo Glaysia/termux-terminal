@@ -12,6 +12,7 @@ The project is intentionally split across two runtimes:
 - `crates/termux-bridge`
   - runs as a standalone process in `Termux`
   - owns local transport, session lifecycle, shell spawning, and stream forwarding
+  - is intended to ship primarily as one `aarch64-unknown-linux-musl` binary that can run in both native Termux and Debian `proot`
 
 ## Why The Bridge Exists
 
@@ -58,6 +59,7 @@ Responsibilities:
 - create or attach to shell-backed terminal sessions
 - forward stdin, stdout, stderr, resize, and control events
 - keep runtime overhead small and predictable on Android
+- stay portable enough that one release binary can be used inside and outside `proot`
 
 Non-goals:
 
@@ -70,6 +72,7 @@ Non-goals:
 - mobile target first: Android
 - plugin implementation language: TypeScript
 - bridge implementation language: Rust
+- bridge release target: `aarch64-unknown-linux-musl`
 - transport direction: plugin connects outward to the local bridge
 - bridge binding: localhost only
 

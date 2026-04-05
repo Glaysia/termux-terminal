@@ -1,0 +1,13 @@
+{
+  "rust-analyzer.server.path": "/usr/bin/rust-analyzer",
+  "rust-analyzer.rustfmt.overrideCommand": [
+    "/usr/bin/rustfmt",
+    "--edition",
+    "2024"
+  ],
+  "rust-analyzer.check.allTargets": false,
+  "rust-analyzer.check.targets": [
+    "aarch64-unknown-linux-musl"
+  ],
+  "rust-analyzer.cargo.target": "aarch64-unknown-linux-musl"
+}

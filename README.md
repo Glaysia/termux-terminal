@@ -1,69 +1,66 @@
 # obsidian-termux
 
-`obsidian-termux` is a mixed-language repository for an Android Obsidian plugin and a small local bridge process for `Termux`.
+`obsidian-termux` is a project for using a real Termux shell session from inside Obsidian on Android.
 
-Supporting design docs live in [`docs/architecture.md`](docs/architecture.md) and [`docs/protocol.md`](docs/protocol.md).
+It is split into two parts: an Obsidian plugin that owns the UI inside the app, and a small local bridge process that runs in Termux and owns the actual shell session. The currently validated runtime model is a single `aarch64-unknown-linux-musl` bridge binary built inside Debian `proot` and run from both Debian `proot` and native Termux.
 
-The project is split by runtime responsibility:
+Korean version: [README.ko.md](README.ko.md)
+
+## Why This Exists
+
+Obsidian on Android does not expose a native terminal environment to plugins in the same way a desktop Electron app would. If the plugin needs a real interactive shell, PTY handling, and process lifecycle management, those responsibilities have to live outside the plugin.
+
+This repository exists to keep that split explicit:
+
+- the Obsidian side handles views, settings, connection state, and terminal-facing UI
+- the Termux side handles transport, shell spawning, PTY/session lifecycle, and stream forwarding
+
+## Repository Structure
 
 - `packages/obsidian-plugin`
-  - TypeScript-based Obsidian plugin
-  - owns mobile UI integration, views, settings, and bridge connection lifecycle
+  TypeScript-based Obsidian plugin responsible for the in-app user experience.
 - `crates/termux-bridge`
-  - Rust-based local bridge process intended to run in `Termux`
-  - owns local socket serving, session attach, stream forwarding, and process/runtime concerns
-
-## Why This Structure
-
-- The Obsidian side naturally fits the plugin ecosystem and stays in TypeScript.
-- The bridge side should stay small, low-overhead, and runtime-efficient on Android.
-- Keeping both in one repository makes protocol and architecture work easier without forcing the bridge into a Node.js runtime.
+  Rust-based local bridge process responsible for talking to the shell runtime in Termux.
 
 ## Current Status
 
-This repository currently contains only the project skeleton.
-
 Implemented:
 
-- root repository layout
+- repository layout
 - `pnpm` workspace for the Obsidian plugin
-- Rust crate skeleton for the Termux bridge
-- minimal plugin entrypoint and manifest
+- minimal plugin skeleton
+- minimal Rust bridge crate
+- `musl`-oriented bridge build path
 
 Not implemented yet:
 
-- actual WebSocket bridge
-- shell/session handling
+- actual WebSocket bridge behavior
+- shell/session management
 - terminal rendering integration
-- protocol definition beyond repository structure
+- completed end-to-end protocol implementation
 
-## Design Docs
+## Validated Environment
 
-- [`docs/architecture.md`](docs/architecture.md): component boundaries, runtime responsibilities, and data flow
-- [`docs/protocol.md`](docs/protocol.md): draft connection model and message shapes between plugin and bridge
+Validated on `2026-04-05`.
 
-## Repository Layout
+The currently validated workflow is:
 
-```text
-.
-├─ crates/
-│  └─ termux-bridge/
-├─ packages/
-│  └─ obsidian-plugin/
-├─ package.json
-├─ pnpm-workspace.yaml
-└─ Cargo.toml
-```
+- build the bridge inside Debian `proot`
+- run the same built binary inside Debian `proot`
+- run the same built binary from native Termux
 
-## Tooling
+Validated assumptions:
 
-- JavaScript workspace: `pnpm`
-- plugin language: TypeScript
-- bridge language: Rust
+- outer runtime: native Termux
+- build environment: Debian `proot`
+- Rust toolchain: Debian-side `rustup`
+- bridge target: `aarch64-unknown-linux-musl`
 
-## Getting Started
+Under the documented runtime path, a native Termux Rust toolchain is not required for running the bridge artifact.
 
-Plugin side:
+## Build
+
+Plugin:
 
 ```bash
 corepack enable
@@ -71,8 +68,59 @@ corepack pnpm install
 corepack pnpm --filter @obsidian-termux/obsidian-plugin build
 ```
 
-Bridge side:
+Bridge:
 
 ```bash
-cargo build -p termux-bridge
+proot-distro login debian --user harry --termux-home -- bash -lc '
+cd /data/data/com.termux/files/home/Projects/obsidian-termux
+rustup toolchain install stable --profile minimal
+rustup default stable
+rustup target add aarch64-unknown-linux-musl
+cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
+'
 ```
+
+Built artifact:
+
+```bash
+/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+```
+
+## Run
+
+Run in Debian `proot`:
+
+```bash
+proot-distro login debian --user harry --termux-home -- bash -lc '
+/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+'
+```
+
+Run in native Termux:
+
+```bash
+/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+```
+
+## Verify The Binary
+
+```bash
+file /data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+ldd /data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+```
+
+Expected result:
+
+- `file` reports `statically linked`
+- `ldd` reports `not a dynamic executable`
+
+## Related Docs
+
+- [`docs/architecture.md`](docs/architecture.md)
+- [`docs/protocol.md`](docs/protocol.md)
+
+## Security Warning
+
+Every line of code in this repository has been generated by AI (`ChatGPT Codex`).
+
+Security is not guaranteed. Do not assume any part of this codebase is safe without independent review, testing, and hardening.
