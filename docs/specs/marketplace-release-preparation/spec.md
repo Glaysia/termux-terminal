@@ -21,13 +21,13 @@ directory submission without claiming support that has not been validated.
 
 ## Non-Goals
 
-- Change the bridge ABI or complete the pending Android Bionic migration.
+- Change the bridge ABI.
 - Publish a release, submit the directory form, or modify `main` directly.
 
 ## Acceptance Criteria
 
-- Public docs describe native Termux only and do not present `proot` as a
-  product runtime or installation requirement.
+- Public docs describe native Termux as the only product runtime and
+  installation requirement.
 - A single semantic version is checked across all release metadata.
 - Release automation rejects a tag that does not match `manifest.json` and
   attaches `main.js`, `manifest.json`, and `styles.css`.

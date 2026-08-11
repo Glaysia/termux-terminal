@@ -43,8 +43,6 @@ The bridge is expected to run as a local process and bind only to:
 The current deployment assumption remains:
 
 - one `aarch64-unknown-linux-musl` binary
-- built inside Debian `proot`
-- runnable inside Debian `proot`
 - runnable from native Termux
 
 ## Roles

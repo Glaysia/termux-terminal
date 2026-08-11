@@ -14,8 +14,6 @@ This document defines the implementation plan for `crates/termux-bridge`.
 
 The goal is to build a small Rust bridge that is structurally sound, easy to verify, and compatible with the current environment contract:
 
-- build inside Debian `proot`
-- run inside Debian `proot`
 - run from native Termux
 - ship one `aarch64-unknown-linux-musl` binary
 
@@ -55,7 +53,6 @@ Confirmed foundation:
 
 Confirmed external programs:
 
-- `proot-distro login debian`
 - `bash`
 - `sh`
 - `file`
@@ -160,11 +157,10 @@ Goal:
 
 Tasks:
 
-- build in Debian `proot` with `aarch64-unknown-linux-musl`
+- build with `aarch64-unknown-linux-musl`
 - verify that the binary remains statically linked
-- run the built binary in Debian `proot`
 - run the same built binary in native Termux
-- confirm the bridge starts and basic protocol flow works in both places
+- confirm the bridge starts and basic protocol flow in native Termux
 
 ## Testing Strategy
 
@@ -187,14 +183,13 @@ Integration tests:
 Manual runtime verification:
 
 - `aarch64-unknown-linux-musl` release build
-- execution in Debian `proot`
 - execution in native Termux
 - real shell interaction
 - resize behavior
 
 ## Risks
 
-- PTY compatibility across desktop Linux, Debian `proot`, and native Termux
+- PTY compatibility in native Termux
 - over-coupling state and transport logic
 - premature feature expansion into reconnect, auth, or multi-session behavior
 
@@ -207,5 +202,5 @@ The Rust side is structurally ready when all of the following are true:
 - single-session lifecycle rules are explicit and covered by tests
 - a real shell can be created, attached, resized, and closed
 - cleanup behavior is predictable on exit and disconnect
-- the same `aarch64-unknown-linux-musl` binary is validated in Debian `proot` and native Termux
+- the `aarch64-unknown-linux-musl` binary is validated in native Termux
 - docs match reality
