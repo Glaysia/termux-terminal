@@ -7,11 +7,26 @@ This repository contains:
 - an Obsidian plugin under `packages/obsidian-plugin`
 - a Rust bridge binary under `crates/termux-bridge`
 
+## Spec-Driven Development
+
+For non-trivial work, start by creating or updating the relevant spec folder under:
+
+- `docs/specs/<slug>/`
+
+Each change folder should contain:
+
+- `spec.md`
+- `plan.md`
+- `tasks.md`
+
+When architecture, protocol, or runtime contracts change, update the relevant canonical foundation docs under:
+
+- `docs/foundation/`
+
 ## Current Environment Contract
 
-The bridge is currently intended to be built inside Debian `proot` and run in both:
+The bridge is built inside Debian `proot` and publicly supported at runtime in:
 
-- Debian `proot`
 - native Termux
 
 The validated shared runtime artifact is:
@@ -32,7 +47,6 @@ The resulting bridge binary was verified to:
 
 - build successfully inside Debian `proot`
 - report as `statically linked`
-- run inside Debian `proot`
 - run from native Termux using the same built artifact
 
 ## Build Guidance
