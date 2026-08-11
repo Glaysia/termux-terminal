@@ -1,13 +1,15 @@
 {
-  "name": "obsidian-termux",
+  "name": "termux-terminal",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "license": "AGPL-3.0-or-later",
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "scripts": {
-    "build": "pnpm --filter @obsidian-termux/obsidian-plugin build && cargo build -p termux-bridge",
-    "typecheck": "pnpm --filter @obsidian-termux/obsidian-plugin typecheck",
-    "build:plugin": "pnpm --filter @obsidian-termux/obsidian-plugin build",
-    "typecheck:plugin": "pnpm --filter @obsidian-termux/obsidian-plugin typecheck",
+    "build": "pnpm --filter @termux-terminal/obsidian-plugin build && cargo build -p termux-bridge",
+    "typecheck": "pnpm --filter @termux-terminal/obsidian-plugin typecheck",
+    "build:plugin": "pnpm --filter @termux-terminal/obsidian-plugin build",
+    "typecheck:plugin": "pnpm --filter @termux-terminal/obsidian-plugin typecheck",
+    "check:release": "node scripts/check-release.mjs",
     "build:bridge": "cargo build -p termux-bridge",
     "build:bridge:musl": "cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release",
     "check:bridge:musl": "cargo check -p termux-bridge --target aarch64-unknown-linux-musl"
