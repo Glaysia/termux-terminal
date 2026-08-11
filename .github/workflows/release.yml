@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: mlugg/setup-zig@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-zigbuild
+      - run: pnpm install --frozen-lockfile
+      - name: Verify release tag
+        run: |
+          version="$(node -p "require('./manifest.json').version")"
+          test "$GITHUB_REF_NAME" = "v$version"
+      - run: pnpm run check:release && pnpm run build:plugin
+      - run: cargo zigbuild -p termux-bridge --target aarch64-unknown-linux-musl --release
+      - name: Assemble release assets
+        run: |
+          mkdir release
+          cp packages/obsidian-plugin/main.js release/main.js
+          cp manifest.json release/manifest.json
+          cp packages/obsidian-plugin/styles.css release/styles.css
+          cp target/aarch64-unknown-linux-musl/release/termux-bridge release/termux-bridge-aarch64-unknown-linux-musl
+          chmod 755 release/termux-bridge-aarch64-unknown-linux-musl
+          (cd release && sha256sum main.js manifest.json styles.css termux-bridge-aarch64-unknown-linux-musl > SHA256SUMS)
+          (cd release && sha256sum -c SHA256SUMS)
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release/*

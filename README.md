@@ -1,126 +1,76 @@
-# obsidian-termux
+# Termux Terminal
 
-`obsidian-termux` is a project for using a real Termux shell session from inside Obsidian on Android.
+Use a real native Termux shell inside Obsidian on Android. Termux Terminal
+renders the terminal in an Obsidian tab while a local Rust bridge owns the PTY,
+shell, and process lifecycle.
 
-It is split into two parts: an Obsidian plugin that owns the UI inside the app, and a small local bridge process that runs in Termux and owns the actual shell session. The currently validated runtime model is a single `aarch64-unknown-linux-musl` bridge binary built inside Debian `proot` and run from both Debian `proot` and native Termux.
+Korean: [README.ko.md](README.ko.md)
 
-Korean version: [README.ko.md](README.ko.md)
+## Requirements
 
-## Why This Exists
+- Android Obsidian with Community plugins enabled
+- native Termux on `aarch64`
+- a hardware keyboard for the supported terminal workflow
 
-Obsidian on Android does not expose a native terminal environment to plugins in the same way a desktop Electron app would. If the plugin needs a real interactive shell, PTY handling, and process lifecycle management, those responsibilities have to live outside the plugin.
+The bridge is local to the device. It is not an SSH client, a remote shell
+server, or a code-server replacement.
 
-This repository exists to keep that split explicit:
+## Install
 
-- the Obsidian side handles views, settings, connection state, and terminal-facing UI
-- the Termux side handles transport, shell spawning, PTY/session lifecycle, and stream forwarding
+After the first GitHub Release is published, run this command in native Termux:
 
-## Repository Structure
-
-- `packages/obsidian-plugin`
-  TypeScript-based Obsidian plugin responsible for the in-app user experience.
-- `crates/termux-bridge`
-  Rust-based local bridge process responsible for talking to the shell runtime in Termux.
-
-## Current Status
-
-Implemented:
-
-- repository layout
-- `pnpm` workspace for the Obsidian plugin
-- minimal plugin skeleton
-- minimal Rust bridge crate
-- `musl`-oriented bridge build path
-
-Not implemented yet:
-
-- actual WebSocket bridge behavior
-- shell/session management
-- terminal rendering integration
-- completed end-to-end protocol implementation
-
-## Validated Environment
-
-Validated on `2026-04-05`.
-
-The currently validated workflow is:
-
-- build the bridge inside Debian `proot`
-- run the same built binary inside Debian `proot`
-- run the same built binary from native Termux
-
-Validated assumptions:
-
-- outer runtime: native Termux
-- build environment: Debian `proot`
-- Rust toolchain: Debian-side `rustup`
-- bridge target: `aarch64-unknown-linux-musl`
-
-Under the documented runtime path, a native Termux Rust toolchain is not required for running the bridge artifact.
-
-## Build
-
-Plugin:
-
-```bash
-corepack enable
-corepack pnpm install
-corepack pnpm --filter @obsidian-termux/obsidian-plugin build
+```sh
+curl -fsSL https://raw.githubusercontent.com/Glaysia/termux-terminal/main/scripts/install-termux-bridge.sh | sh
 ```
 
-Bridge:
+The installer verifies the published checksum, installs the bridge as a
+Termux `runit` service, and prints a connection token once.
 
-```bash
-proot-distro login debian --user harry --termux-home -- bash -lc '
-cd /data/data/com.termux/files/home/Projects/obsidian-termux
-rustup toolchain install stable --profile minimal
-rustup default stable
-rustup target add aarch64-unknown-linux-musl
-cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
-'
+In Obsidian:
+
+1. Install **Termux Terminal** from Community plugins.
+2. Open its settings and paste the printed bridge token.
+3. Use the terminal ribbon icon or the `Open terminal` command.
+
+## Shell Startup
+
+Each terminal tab starts a fresh interactive Bash session. Bridge-owned Bash
+sources `~/.obsidianrc` only. It does not automatically source `~/.bashrc`.
+
+The installer creates a commented `source ~/.bashrc` line in `.obsidianrc`.
+Uncomment it only when the ordinary Bash setup is appropriate for terminals
+opened from Obsidian.
+
+## Security
+
+- The bridge listens on `127.0.0.1` only.
+- Every connection requires the installation token stored in
+  `~/.termux_terminal_token` with mode `0600`.
+- Tokens expire after six months; the shell warns during the final seven days.
+- Terminal data, tokens, and shell output are not recorded by default.
+- Any network forwarding is configured and secured by the user. The plugin
+  never changes the loopback-only bridge binding.
+
+## Operation
+
+Check the native service from Termux:
+
+```sh
+SVDIR="$PREFIX/var/service" sv status termux-terminal-bridge
 ```
 
-Built artifact:
+Restart it after updating the bridge:
 
-```bash
-/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
+```sh
+SVDIR="$PREFIX/var/service" sv restart termux-terminal-bridge
 ```
 
-## Run
+## Development
 
-Run in Debian `proot`:
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for branch and validation rules.
+Release notes are in [CHANGELOG.md](CHANGELOG.md). Security reports are handled
+under [SECURITY.md](SECURITY.md).
 
-```bash
-proot-distro login debian --user harry --termux-home -- bash -lc '
-/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
-'
-```
+## License
 
-Run in native Termux:
-
-```bash
-/data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
-```
-
-## Verify The Binary
-
-```bash
-file /data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
-ldd /data/data/com.termux/files/home/Projects/obsidian-termux/target/aarch64-unknown-linux-musl/release/termux-bridge
-```
-
-Expected result:
-
-- `file` reports `statically linked`
-- `ldd` reports `not a dynamic executable`
-
-## Related Docs
-
-- [`docs/architecture.md`](docs/architecture.md)
-- [`docs/protocol.md`](docs/protocol.md)
-
-## Security Warning
-
-Every line of code in this repository has been generated by AI (`ChatGPT Codex`).
-
-Security is not guaranteed. Do not assume any part of this codebase is safe without independent review, testing, and hardening.
+AGPL-3.0-or-later. See [LICENSE](LICENSE).

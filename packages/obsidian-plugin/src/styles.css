@@ -1,0 +1,34 @@
+.obsidian-termux-terminal {
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+
+.obsidian-termux-terminal__surface {
+  height: 100%;
+  min-height: 0;
+}
+
+.obsidian-termux-terminal__status {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 6;
+}
+
+.obsidian-termux-terminal__status::before {
+  background: var(--text-muted);
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 8px;
+  width: 8px;
+}
+
+.obsidian-termux-terminal__status[data-status="connected"]::before {
+  background: var(--color-green);
+}
+
+.obsidian-termux-terminal__status[data-status="error"]::before {
+  background: var(--color-red);
+}
