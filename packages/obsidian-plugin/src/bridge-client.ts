@@ -126,10 +126,11 @@ export class BridgeClient {
         this.socket = null;
         this.attached = false;
         this.clearConnectionTimeout();
-        this.options.onStatus("disconnected");
-        if (!this.terminalExited && !this.authenticationFailed) {
-          this.scheduleReconnect();
+        if (this.terminalExited || this.authenticationFailed) {
+          return;
         }
+        this.options.onStatus("disconnected");
+        this.scheduleReconnect();
       }
     });
   }
