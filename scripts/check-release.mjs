@@ -7,7 +7,11 @@ const manifests = await Promise.all(
 const packageJson = JSON.parse(
   await readFile("packages/obsidian-plugin/package.json", "utf8"),
 );
+const rootPackageJson = JSON.parse(await readFile("package.json", "utf8"));
+const versions = JSON.parse(await readFile("versions.json", "utf8"));
+const cargoToml = await readFile("Cargo.toml", "utf8");
 const [rootManifest, pluginManifest] = manifests.map(({ value }) => value);
+const cargoVersion = cargoToml.match(/(^\[workspace\.package\][\s\S]*?^version = )"([^"]+)"/m)?.[2];
 
 for (const { path, value } of manifests) {
   if (!/^\d+\.\d+\.\d+$/.test(value.version)) {
@@ -21,8 +25,16 @@ for (const { path, value } of manifests) {
 if (rootManifest.id !== pluginManifest.id) {
   throw new Error("Root and plugin manifest IDs must match");
 }
-if (rootManifest.version !== pluginManifest.version || pluginManifest.version !== packageJson.version) {
-  throw new Error("Root manifest, plugin manifest, and package versions must match");
+if (
+  rootManifest.version !== pluginManifest.version ||
+  pluginManifest.version !== packageJson.version ||
+  packageJson.version !== rootPackageJson.version ||
+  rootPackageJson.version !== cargoVersion
+) {
+  throw new Error("Plugin, root package, manifest, and bridge versions must match");
+}
+if (versions[rootManifest.version] !== rootManifest.minAppVersion) {
+  throw new Error("versions.json must map the current plugin version to minAppVersion");
 }
 
 console.log(`Release metadata verified: ${rootManifest.id} v${rootManifest.version}`);
