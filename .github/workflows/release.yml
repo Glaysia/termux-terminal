@@ -19,6 +19,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-musl
       - uses: mlugg/setup-zig@v2
       - uses: taiki-e/install-action@v2
         with:
