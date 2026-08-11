@@ -3,10 +3,12 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - "*.*.*"
 
 permissions:
   contents: write
+  attestations: write
+  id-token: write
 
 jobs:
   release:
@@ -29,20 +31,35 @@ jobs:
       - name: Verify release tag
         run: |
           version="$(node -p "require('./manifest.json').version")"
-          test "$GITHUB_REF_NAME" = "v$version"
+          test "$GITHUB_REF_NAME" = "$version"
       - run: pnpm run check:release && pnpm run build:plugin
       - run: cargo zigbuild -p termux-bridge --target aarch64-unknown-linux-musl --release
       - name: Assemble release assets
         run: |
-          mkdir release
-          cp packages/obsidian-plugin/main.js release/main.js
-          cp manifest.json release/manifest.json
-          cp packages/obsidian-plugin/styles.css release/styles.css
-          cp target/aarch64-unknown-linux-musl/release/termux-bridge release/termux-bridge-aarch64-unknown-linux-musl
-          chmod 755 release/termux-bridge-aarch64-unknown-linux-musl
-          (cd release && sha256sum main.js manifest.json styles.css termux-bridge-aarch64-unknown-linux-musl > SHA256SUMS)
-          (cd release && sha256sum -c SHA256SUMS)
+          mkdir plugin-release bridge-release
+          cp packages/obsidian-plugin/main.js plugin-release/main.js
+          cp manifest.json plugin-release/manifest.json
+          cp packages/obsidian-plugin/styles.css plugin-release/styles.css
+          cp target/aarch64-unknown-linux-musl/release/termux-bridge bridge-release/termux-bridge-aarch64-unknown-linux-musl
+          chmod 755 bridge-release/termux-bridge-aarch64-unknown-linux-musl
+          (cd bridge-release && sha256sum termux-bridge-aarch64-unknown-linux-musl > SHA256SUMS)
+          (cd bridge-release && sha256sum -c SHA256SUMS)
+      - name: Attest release assets
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            plugin-release/main.js
+            plugin-release/manifest.json
+            plugin-release/styles.css
+            bridge-release/termux-bridge-aarch64-unknown-linux-musl
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: release/*
+          files: plugin-release/*
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: bridge-${{ github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: Termux Terminal bridge ${{ github.ref_name }}
+          make_latest: false
+          files: bridge-release/*

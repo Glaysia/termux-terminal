@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, SettingDefinitionItem, WorkspaceLeaf } from "obsidian";
 import { TERMINAL_VIEW_TYPE, TerminalView } from "./terminal-view";
 
 interface TermuxTerminalSettings { bridgeUrl: string; token: string; inputDebugLog: boolean; }
@@ -19,12 +19,8 @@ export default class ObsidianTermuxPlugin extends Plugin {
     this.addCommand({
       id: "open-terminal",
       name: "Open terminal",
-      callback: () => this.openTerminal(),
+      callback: () => void this.openTerminal(),
     });
-  }
-
-  onunload(): void {
-    this.app.workspace.detachLeavesOfType(TERMINAL_VIEW_TYPE);
   }
 
   private async openTerminal(): Promise<void> {
@@ -38,11 +34,33 @@ export default class ObsidianTermuxPlugin extends Plugin {
 
 class TermuxTerminalSettingTab extends PluginSettingTab {
   constructor(app: App, private readonly plugin: ObsidianTermuxPlugin) { super(app, plugin); }
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-    new Setting(containerEl).setName("Bridge URL").setDesc("Local Termux bridge WebSocket URL.").addText((text) => text.setValue(this.plugin.settings.bridgeUrl).onChange(async (value) => { this.plugin.settings.bridgeUrl = value.trim(); await this.plugin.saveSettings(); }));
-    new Setting(containerEl).setName("Bridge token").setDesc("Token from ~/.termux_terminal_token.").addText((text) => { text.inputEl.type = "password"; text.setValue(this.plugin.settings.token).onChange(async (value) => { this.plugin.settings.token = value; await this.plugin.saveSettings(); }); });
-    new Setting(containerEl).setName("Input debug log").setDesc("Show session-local keyboard and terminal input records. Logs are not saved or sent anywhere else.").addToggle((toggle) => toggle.setValue(this.plugin.settings.inputDebugLog).onChange(async (value) => { this.plugin.settings.inputDebugLog = value; await this.plugin.saveSettings(); }));
+
+  getSettingDefinitions(): SettingDefinitionItem<keyof TermuxTerminalSettings>[] {
+    return [
+      {
+        name: "Bridge URL",
+        desc: "Local Termux bridge WebSocket URL.",
+        control: { type: "text", key: "bridgeUrl" },
+      },
+      {
+        name: "Bridge token",
+        desc: "Token from ~/.termux_terminal_token.",
+        render: (setting) => {
+          setting.addText((text) => {
+            text.inputEl.type = "password";
+            text.setValue(this.plugin.settings.token);
+            text.onChange(async (value) => {
+              this.plugin.settings.token = value;
+              await this.plugin.saveSettings();
+            });
+          });
+        },
+      },
+      {
+        name: "Input debug log",
+        desc: "Show session-local keyboard and terminal input records. Logs are not saved or sent anywhere else.",
+        control: { type: "toggle", key: "inputDebugLog" },
+      },
+    ];
   }
 }

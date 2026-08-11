@@ -2,8 +2,8 @@
   "id": "termux-terminal",
   "name": "Termux Terminal",
   "version": "1.0.4",
-  "minAppVersion": "1.5.0",
-  "description": "A real interactive Termux terminal inside Obsidian on Android.",
+  "minAppVersion": "1.13.0",
+  "description": "A real interactive Termux terminal on Android.",
   "author": "willbecat27",
   "authorUrl": "https://github.com/Glaysia",
   "isDesktopOnly": false

@@ -8,7 +8,6 @@ prefix="${PREFIX:-/data/data/com.termux/files/usr}"
 service_name="termux-terminal-bridge"
 service_dir="$prefix/var/service/$service_name"
 binary="$prefix/bin/$service_name"
-release_base="https://github.com/$repository/releases/latest/download"
 temp_dir="$(mktemp -d)"
 
 cleanup() {
@@ -22,6 +21,15 @@ if [ "$(uname -m)" != "aarch64" ]; then
 fi
 
 pkg install -y curl openssl-tool runit
+bridge_tag="${TERMUX_TERMINAL_BRIDGE_TAG:-}"
+if [ -z "$bridge_tag" ]; then
+  bridge_tag="$(curl -fsSL "https://api.github.com/repos/$repository/releases?per_page=100" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\(bridge-[^"]*\)".*/\1/p' | head -n 1)"
+fi
+if [ -z "$bridge_tag" ]; then
+  echo "No bridge release was found for $repository." >&2
+  exit 1
+fi
+release_base="https://github.com/$repository/releases/download/$bridge_tag"
 curl -fsSL "$release_base/$asset" -o "$temp_dir/$asset"
 curl -fsSL "$release_base/SHA256SUMS" -o "$temp_dir/SHA256SUMS"
 
