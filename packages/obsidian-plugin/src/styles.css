@@ -1,24 +1,23 @@
 .obsidian-termux-terminal {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  min-height: 0;
   padding: 0;
   position: relative;
 }
 
 .obsidian-termux-terminal__surface {
-  height: 100%;
+  flex: 1 1 auto;
   min-height: 0;
 }
 
 .obsidian-termux-terminal__input-debug-panel {
   background: var(--background-primary-alt);
   border-top: 1px solid var(--background-modifier-border);
-  bottom: 0;
   display: grid;
-  grid-template-rows: 28px minmax(96px, 24vh);
-  left: 0;
-  position: absolute;
-  right: 0;
-  z-index: 5;
+  flex: 0 0 clamp(124px, 24vh, 280px);
+  grid-template-rows: 28px minmax(96px, 1fr);
 }
 
 .obsidian-termux-terminal__input-debug-controls {
