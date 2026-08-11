@@ -2,7 +2,7 @@
 
 All notable user-facing changes are recorded here.
 
-## 1.0.2 - Unreleased
+## 1.0.3 - Unreleased
 
 ### Added
 
@@ -14,6 +14,8 @@ All notable user-facing changes are recorded here.
 ### Changed
 
 - Terminal reconnect uses bounded backoff while preserving visible scrollback.
+- GitHub Release builds install the Rust musl target before cross-compiling the
+  bridge.
 
 ### Known Limitations
 
@@ -21,3 +23,8 @@ All notable user-facing changes are recorded here.
 - A hardware keyboard is required for the supported terminal workflow.
 - The first public release is pending GitHub Release publication and Community
   directory review.
+
+## 1.0.2 - Unreleased
+
+- Release workflow request failed before publication because the GitHub runner
+  did not install the Rust musl target. No GitHub Release assets were published.
