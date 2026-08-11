@@ -39,7 +39,7 @@ Termux supplies a capable Android shell but does not provide a satisfying multi-
 - the Obsidian plugin is only a minimal skeleton
 - `termux-bridge` has a V1 localhost-only WebSocket contract with one ephemeral shell per connection
 - the V1 contract intentionally excludes reconnect, session persistence, cross-connection session attachment, and binary frames
-- the validated bridge artifact remains `aarch64-unknown-linux-musl`, built inside Debian proot and runnable in both supported runtimes
+- the validated bridge artifact remains `aarch64-unknown-linux-musl` and runs in native Termux
 
 ## Proposed Behavior
 

@@ -1,12 +1,62 @@
 .obsidian-termux-terminal {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  min-height: 0;
   padding: 0;
   position: relative;
 }
 
 .obsidian-termux-terminal__surface {
-  height: 100%;
+  flex: 1 1 auto;
   min-height: 0;
+}
+
+.obsidian-termux-terminal__input-debug-panel {
+  background: var(--background-primary-alt);
+  border-top: 1px solid var(--background-modifier-border);
+  display: grid;
+  flex: 0 0 clamp(124px, 24vh, 280px);
+  grid-template-rows: 28px minmax(96px, 1fr);
+}
+
+.obsidian-termux-terminal__input-debug-controls {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  padding: 2px 6px;
+}
+
+.obsidian-termux-terminal__input-debug-controls button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-muted);
+  display: inline-flex;
+  height: 24px;
+  justify-content: center;
+  padding: 4px;
+  width: 24px;
+}
+
+.obsidian-termux-terminal__input-debug-controls button:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.obsidian-termux-terminal__input-debug {
+  background: var(--background-primary-alt);
+  border: 0;
+  border-radius: 0;
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  min-height: 0;
+  padding: 6px 8px;
+  resize: none;
+  width: 100%;
 }
 
 .obsidian-termux-terminal__status {

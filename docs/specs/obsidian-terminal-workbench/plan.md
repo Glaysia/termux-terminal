@@ -156,7 +156,7 @@ Exit condition: the workbench improves day-to-day Android shell work rather than
 - terminal tests: ANSI rendering, resize, long output, interactive prompts, Ctrl/Cmd-equivalent input, and shell exit
 - bridge tests: protocol ordering, session lifecycle, disconnection, restart, and invalid messages
 - workflow tests: Codex command sessions, Git status/diff, project navigation, and note-to-terminal handoff
-- runtime tests: Debian proot build, Debian proot execution, native Termux execution, and Android Obsidian connection
+- runtime tests: native Termux execution and Android Obsidian connection
 
 ## Assumptions
 

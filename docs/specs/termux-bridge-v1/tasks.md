@@ -16,15 +16,14 @@
 4. [ ] Lock down session lifecycle behavior and invalid-state handling.
 5. [ ] Integrate a real PTY-backed shell session.
 6. [ ] Add resize handling and robust cleanup on close, exit, and disconnect.
-7. [ ] Validate the supported build and runtime matrix in Debian `proot` and native Termux.
+7. [ ] Validate the supported native Termux build and runtime path.
 
 ## Validation
 
 - [ ] `cargo test -p termux-bridge`
-- [ ] `cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release` inside Debian `proot`
+- [ ] `cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release`
 - [ ] `file` reports the release artifact as statically linked
 - [ ] `ldd` reports the release artifact as not a dynamic executable
-- [ ] runtime smoke check passes in Debian `proot`
 - [ ] runtime smoke check passes in native Termux
 
 ## Documentation Updates

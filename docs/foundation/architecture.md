@@ -83,7 +83,7 @@ Non-goals:
 - bridge release target: `aarch64-unknown-linux-musl`
 - transport direction: plugin connects outward to the local bridge
 - bridge binding: localhost only
-- public bridge runtime: native Termux; Debian `proot` is a build environment, not a supported release runtime
+- public bridge runtime: native Termux
 - each terminal view opens its own bridge connection and owns an ephemeral shell
 - closing a view or losing its connection closes only that connection's shell
 

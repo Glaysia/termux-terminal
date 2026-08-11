@@ -27,7 +27,6 @@ Prepare the accepted terminal vertical slice for a first public release and Obsi
 
 ## Non-Goals
 
-- support running the released bridge inside Debian `proot`
 - automate submission or review in the Obsidian Community directory
 - expose the bridge on LAN or the Internet
 - implement SSH, port forwarding, Windows, or Linux support in this release
@@ -48,8 +47,9 @@ Prepare the accepted terminal vertical slice for a first public release and Obsi
 
 - Work and Android deployments continue on `feat/terminal-vertical-slice`; `main` stays clean until a tested release candidate is squash-merged.
 - Every Android deployment increments the plugin version. `1.0.0` is the first public release, not the next development deployment.
-- GitHub releases publish `main.js`, `manifest.json`, `styles.css`, `termux-bridge-aarch64-unknown-linux-musl`, and `SHA256SUMS`.
-- Public runtime support is native Termux on `aarch64`. Debian `proot` remains an optional build environment only.
+- GitHub plugin releases publish `main.js`, `manifest.json`, and `styles.css`.
+  A matching bridge release publishes the binary and `SHA256SUMS`.
+- Public runtime support is native Termux on `aarch64`.
 
 ### Authentication And Installation
 

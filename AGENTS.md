@@ -23,49 +23,25 @@ When architecture, protocol, or runtime contracts change, update the relevant ca
 
 - `docs/foundation/`
 
-## Current Environment Contract
+## Runtime Contract
 
-The bridge is built inside Debian `proot` and publicly supported at runtime in:
-
-- native Termux
-
-The validated shared runtime artifact is:
-
-- `aarch64-unknown-linux-musl`
-
-Native Termux-side Rust tooling is not required for running the built bridge binary.
-
-## Verified Setup
-
-Verified working on 2026-04-05 with:
-
-- native Termux used as the outer host/runtime
-- Debian `proot` used as the build environment
-- Debian `rustup` toolchain with target `aarch64-unknown-linux-musl`
-
-The resulting bridge binary was verified to:
-
-- build successfully inside Debian `proot`
-- report as `statically linked`
-- run from native Termux using the same built artifact
+- Public runtime: native Termux on Android `aarch64`.
+- Release bridge target: `aarch64-unknown-linux-musl`.
+- The bridge binds only to `127.0.0.1`.
+- Native Termux-side Rust tooling is not required to run the released bridge.
 
 ## Build Guidance
 
-When working on `crates/termux-bridge`, prefer:
+When working on `crates/termux-bridge`, use:
 
 ```bash
-proot-distro login debian --user harry --termux-home -- bash -lc '
-cd /data/data/com.termux/files/home/Projects/obsidian-termux
 cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
-'
 ```
-
-Avoid reintroducing old `prootrust` wrapper paths or Termux-native Rust shims unless there is a clear reason.
 
 ## Documentation Rule
 
-If the validated build or runtime environment changes, update:
+If the runtime or distribution contract changes, update:
 
-- `README.md`
-- `crates/termux-bridge/README.md`
+- `docs/vision.md`
+- `docs/foundation/`
 - this file

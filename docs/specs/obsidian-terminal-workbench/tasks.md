@@ -179,9 +179,9 @@ Defer these implementation contracts until the terminal vertical slice exists an
 
 30. [x] Runtime selection
    - A. Native Termux bridge only
-   - B. Debian proot bridge only
-   - C. Same musl binary supports both, user selects launch mode
-   - Selected: C (2026-08-09)
+   - B. Desktop bridge only
+   - C. Multiple Android runtime modes
+   - Selected: A (2026-08-11)
 
 ## Subject 7: Terminal-Only Scope
 

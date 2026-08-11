@@ -12,7 +12,7 @@
 
 Build the first meaningful version of `termux-bridge` as a small Rust process that exposes a localhost WebSocket endpoint and owns a single shell-backed session for the Obsidian plugin.
 
-The bridge should be structurally small, testable, and compatible with the current Debian `proot` plus native Termux runtime contract.
+The bridge should be structurally small, testable, and compatible with the native Termux runtime contract.
 
 ## Goals
 
@@ -34,10 +34,8 @@ The bridge should be structurally small, testable, and compatible with the curre
 
 ## Environment Constraints
 
-- build inside Debian `proot`
-- run inside Debian `proot`
 - run from native Termux
-- use one `aarch64-unknown-linux-musl` binary across those environments
+- use one `aarch64-unknown-linux-musl` binary
 
 ## Current State
 
@@ -48,7 +46,7 @@ The repository already has the architectural split, protocol contract, and Rust 
 - the bridge listens on `127.0.0.1:11557`
 - the bridge follows the V1 protocol documented in the foundation protocol doc
 - the bridge owns shell/session lifecycle rather than the plugin
-- the implementation remains compatible with the validated Debian `proot` and native Termux workflow
+- the implementation remains compatible with native Termux
 - documentation stays aligned when protocol, architecture, or environment assumptions change
 
 ## Related Docs

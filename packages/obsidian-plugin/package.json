@@ -1,7 +1,7 @@
 {
   "name": "@termux-terminal/obsidian-plugin",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "main.js",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
-    "obsidian": "^1.8.10"
+    "obsidian": "^1.13.1"
   },
   "devDependencies": {
     "esbuild": "^0.25.9"

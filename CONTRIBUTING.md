@@ -2,14 +2,12 @@
 
 ## Branches
 
-- `main` contains approved release history and is changed through pull requests
-  only.
-- `dev` is the integration branch.
-- Keep at most two active `feat/*` branches. Branch each one from `dev`.
-
-Use a pull request from `feat/*` to `dev`. Preserve meaningful feature commits
-with a merge commit. Open a separate `dev` to `main` pull request only after
-Android validation; squash that PR so `main` keeps a short release history.
+- `main` contains reviewed, release-ready commits only.
+- `dev` is the integration branch and may receive direct maintainer pushes.
+- Keep at most two active `feat/*` branches. Merge feature work into `dev` with
+  small descriptive commits.
+- Merge `dev` into `main` through a pull request using squash merge, then merge
+  the resulting `main` commit back into `dev`.
 
 ## Development Rules
 
@@ -22,18 +20,30 @@ Android validation; squash that PR so `main` keeps a short release history.
 - Never commit a token, terminal output containing private data, or a test-vault
   `data.json` file.
 
+## Versioning
+
+Every changed deployable plugin build receives a new semantic version. Deploy
+matching `main.js`, `manifest.json`, and `styles.css` together. The manifest
+and GitHub release tag use `x.y.z` format without a `v` prefix.
+
 ## Validation
 
-Run before opening a pull request:
+Before a release, run:
 
-```sh
-pnpm install --frozen-lockfile
+```bash
 pnpm run typecheck:plugin
-pnpm run build:plugin
+pnpm run build
 pnpm run check:release
 cargo test -p termux-bridge --test websocket_server -- --test-threads=1
+cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
 ```
 
-For a plugin deployment, use a new version and copy matching `main.js`,
-`manifest.json`, and `styles.css` together. Validate the Android interaction
-that the change affects with a physical keyboard where applicable.
+Also validate the Android Obsidian terminal with a hardware keyboard.
+
+## Release
+
+1. Merge the release candidate from `dev` into `main`.
+2. Push the matching bare semantic tag, for example `1.0.4`.
+3. Confirm GitHub Actions publishes the plugin release, separate bridge release,
+   checksums, and provenance attestations.
+4. Check the Obsidian Community review result before public promotion.
