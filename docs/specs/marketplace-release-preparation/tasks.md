@@ -8,4 +8,6 @@
 - [ ] Submit the plugin through the Obsidian Community directory.
 - [x] Diagnose the failed `v1.0.2` Release workflow: the GitHub Rust toolchain
   lacked the musl target.
+- [x] Add a pull-request CI workflow that validates the native musl release
+  build before merge.
 - [ ] Publish `v1.0.3` after the corrected workflow is merged.
