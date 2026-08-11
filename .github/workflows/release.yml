@@ -24,6 +24,10 @@ jobs:
         with:
           tool: cargo-zigbuild
       - run: pnpm install --frozen-lockfile
+      - name: Verify release tag
+        run: |
+          version="$(node -p "require('./manifest.json').version")"
+          test "$GITHUB_REF_NAME" = "v$version"
       - run: pnpm run check:release && pnpm run build:plugin
       - run: cargo zigbuild -p termux-bridge --target aarch64-unknown-linux-musl --release
       - name: Assemble release assets
@@ -35,6 +39,7 @@ jobs:
           cp target/aarch64-unknown-linux-musl/release/termux-bridge release/termux-bridge-aarch64-unknown-linux-musl
           chmod 755 release/termux-bridge-aarch64-unknown-linux-musl
           (cd release && sha256sum main.js manifest.json styles.css termux-bridge-aarch64-unknown-linux-musl > SHA256SUMS)
+          (cd release && sha256sum -c SHA256SUMS)
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
