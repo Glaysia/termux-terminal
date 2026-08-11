@@ -1,64 +1,75 @@
 # Termux Terminal
 
-An interactive Termux shell inside Obsidian on Android. The Obsidian plugin
-renders xterm.js; a small Rust bridge owns the local PTY and shell.
+Use a real native Termux shell inside Obsidian on Android. Termux Terminal
+renders the terminal in an Obsidian tab while a local Rust bridge owns the PTY,
+shell, and process lifecycle.
 
 Korean: [README.ko.md](README.ko.md)
 
-## Status
+## Requirements
 
-`1.0.0` is under Android release-candidate testing. The public runtime target
-is native aarch64 Termux. The bridge listens only on `127.0.0.1:11557`.
+- Android Obsidian with Community plugins enabled
+- native Termux on `aarch64`
+- a hardware keyboard for the supported terminal workflow
+
+The bridge is local to the device. It is not an SSH client, a remote shell
+server, or a code-server replacement.
 
 ## Install
 
-After the first GitHub release, run this in native Termux:
+After the first GitHub Release is published, run this command in native Termux:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/Glaysia/termux-terminal/main/scripts/install-termux-bridge.sh | sh
 ```
 
-The installer downloads the release binary, verifies `SHA256SUMS`, creates a
-`runit` service, creates `~/.termux_terminal_token` with mode `0600`, and
-prints the token once. Paste that token into Obsidian Settings > Termux
-Terminal. Then use the ribbon terminal icon or the `Open terminal` command.
+The installer verifies the published checksum, installs the bridge as a
+Termux `runit` service, and prints a connection token once.
+
+In Obsidian:
+
+1. Install **Termux Terminal** from Community plugins.
+2. Open its settings and paste the printed bridge token.
+3. Use the terminal ribbon icon or the `Open terminal` command.
 
 ## Shell Startup
 
-Bridge-owned Bash sessions source `~/.obsidianrc`. They do not automatically
-source `~/.bashrc`. The generated template includes a commented
-`source ~/.bashrc` line for users who want their ordinary interactive setup.
+Each terminal tab starts a fresh interactive Bash session. Bridge-owned Bash
+sources `~/.obsidianrc` only. It does not automatically source `~/.bashrc`.
+
+The installer creates a commented `source ~/.bashrc` line in `.obsidianrc`.
+Uncomment it only when the ordinary Bash setup is appropriate for terminals
+opened from Obsidian.
 
 ## Security
 
-- The bridge binds to loopback only.
-- Every production connection must provide the installation token in its first
-  WebSocket message.
-- Tokens are valid for six months, with a seven-day shell warning period.
-- Default logs never record tokens, terminal input, or terminal output.
+- The bridge listens on `127.0.0.1` only.
+- Every connection requires the installation token stored in
+  `~/.termux_terminal_token` with mode `0600`.
+- Tokens expire after six months; the shell warns during the final seven days.
+- Terminal data, tokens, and shell output are not recorded by default.
+- Any network forwarding is configured and secured by the user. The plugin
+  never changes the loopback-only bridge binding.
+
+## Operation
+
+Check the native service from Termux:
+
+```sh
+SVDIR="$PREFIX/var/service" sv status termux-terminal-bridge
+```
+
+Restart it after updating the bridge:
+
+```sh
+SVDIR="$PREFIX/var/service" sv restart termux-terminal-bridge
+```
 
 ## Development
 
-Feature development happens on `feat/terminal-vertical-slice`; accepted release
-candidates are squash-merged into `main`. See [GOAL.md](GOAL.md) and
-`docs/specs/public-release-preparation/`.
-
-```sh
-pnpm install --frozen-lockfile
-pnpm run check:release
-pnpm run typecheck:plugin
-pnpm run build:plugin
-cargo test -p termux-bridge
-```
-
-Build the release bridge inside Debian `proot`:
-
-```sh
-cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
-```
-
-The resulting native Termux artifact is
-`target/aarch64-unknown-linux-musl/release/termux-bridge`.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for branch and validation rules.
+Release notes are in [CHANGELOG.md](CHANGELOG.md). Security reports are handled
+under [SECURITY.md](SECURITY.md).
 
 ## License
 
