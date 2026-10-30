@@ -26,6 +26,7 @@ jobs:
         with:
           tool: cargo-zigbuild
       - run: pnpm install --frozen-lockfile
+      - run: sh -n scripts/install-termux-bridge.sh
       - run: pnpm run typecheck:plugin
       - run: pnpm run build:plugin
       - run: pnpm run check:release

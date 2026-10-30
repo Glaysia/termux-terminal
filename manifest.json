@@ -1,7 +1,7 @@
 {
   "id": "termux-terminal",
   "name": "Termux Terminal",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "minAppVersion": "1.13.0",
   "description": "A real interactive Termux terminal on Android.",
   "author": "willbecat27",

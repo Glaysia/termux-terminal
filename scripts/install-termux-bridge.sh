@@ -20,7 +20,7 @@ if [ "$(uname -m)" != "aarch64" ]; then
   exit 1
 fi
 
-pkg install -y curl openssl-tool runit
+pkg install -y curl openssl-tool runit termux-services
 bridge_tag="${TERMUX_TERMINAL_BRIDGE_TAG:-}"
 if [ -z "$bridge_tag" ]; then
   bridge_tag="$(curl -fsSL "https://api.github.com/repos/$repository/releases?per_page=100" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\(bridge-[^"]*\)".*/\1/p' | head -n 1)"
@@ -68,8 +68,19 @@ chmod 700 "$service_dir/run"
 
 SVDIR="$prefix/var/service"
 if [ ! -d "$service_dir/supervise" ]; then
-  service-daemon start || true
+  SVDIR="$SVDIR" service-daemon start || true
 fi
-SVDIR="$SVDIR" sv up "$service_name"
 
-printf '%s\n' "Installed and started $service_name." "Bridge token: $token" "Paste the token into Obsidian Settings > Termux Terminal."
+# runsvdir may take several seconds to discover a newly installed service.
+attempt=0
+while [ ! -p "$service_dir/supervise/ok" ] && [ "$attempt" -lt 10 ]; do
+  sleep 1
+  attempt=$((attempt + 1))
+done
+
+if SVDIR="$SVDIR" sv up "$service_name"; then
+  printf '%s\n' "Installed and started $service_name." "Bridge token: $token" "Paste the token into Obsidian Settings > Termux Terminal."
+else
+  printf '%s\n' "The service could not be started. Fully exit and reopen Termux, then run this installer again." >&2
+  exit 1
+fi
