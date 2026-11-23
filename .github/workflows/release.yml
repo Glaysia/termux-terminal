@@ -25,8 +25,11 @@ jobs:
           targets: aarch64-linux-android
       - name: Install Android NDK
         run: |
-          sdkmanager "ndk;30.0.16248370"
-          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> "$GITHUB_ENV"
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 3 https://dl.google.com/android/repository/android-ndk-r30-linux.zip -o android-ndk-r30-linux.zip
+          echo "5107f898313790e449e87eee2183d9a20602dee9  android-ndk-r30-linux.zip" | sha1sum -c -
+          unzip -q android-ndk-r30-linux.zip
+          echo "ANDROID_NDK_HOME=$RUNNER_TEMP/android-ndk-r30" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - name: Verify release tag
         run: |
