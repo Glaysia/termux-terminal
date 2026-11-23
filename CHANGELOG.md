@@ -2,6 +2,11 @@
 
 All notable user-facing changes are recorded here.
 
+## 1.0.6 - Unreleased
+
+- Build the ARM64 bridge as an Android PIE to address the linker error in #7.
+- Restart the runit service after a bridge upgrade so it loads the new binary.
+
 ## 1.0.3 - Unreleased
 
 ### Added

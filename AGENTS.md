@@ -26,16 +26,16 @@ When architecture, protocol, or runtime contracts change, update the relevant ca
 ## Runtime Contract
 
 - Public runtime: native Termux on Android `aarch64`.
-- Release bridge target: `aarch64-unknown-linux-musl`.
+- Release bridge target: `aarch64-linux-android`.
 - The bridge binds only to `127.0.0.1`.
 - Native Termux-side Rust tooling is not required to run the released bridge.
 
 ## Build Guidance
 
-When working on `crates/termux-bridge`, use:
+For a release build of `crates/termux-bridge`, set `ANDROID_NDK_HOME` to NDK r30 and use:
 
 ```bash
-cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
+sh scripts/build-android-bridge.sh
 ```
 
 ## Documentation Rule

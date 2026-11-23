@@ -20,15 +20,15 @@ jobs:
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-musl
-      - uses: mlugg/setup-zig@v2
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-zigbuild
+          targets: aarch64-linux-android
+      - name: Install Android NDK
+        run: |
+          sdkmanager "ndk;30.0.16248370"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - run: sh -n scripts/install-termux-bridge.sh
       - run: pnpm run typecheck:plugin
       - run: pnpm run build:plugin
       - run: pnpm run check:release
       - run: cargo test -p termux-bridge --test websocket_server -- --test-threads=1
-      - run: cargo zigbuild -p termux-bridge --target aarch64-unknown-linux-musl --release
+      - run: sh scripts/build-android-bridge.sh
