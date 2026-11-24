@@ -20,7 +20,7 @@ The project is intentionally split across two runtimes:
 - `crates/termux-bridge`
   - runs as a standalone process in `Termux`
   - owns local transport, session lifecycle, shell spawning, and stream forwarding
-  - ships as one `aarch64-unknown-linux-musl` binary for native Termux
+  - ships as one `aarch64-linux-android` binary for native Termux
 
 ## Why The Bridge Exists
 
@@ -80,7 +80,7 @@ Non-goals:
 - mobile target first: Android
 - plugin implementation language: TypeScript
 - bridge implementation language: Rust
-- bridge release target: `aarch64-unknown-linux-musl`
+- bridge release target: `aarch64-linux-android`
 - transport direction: plugin connects outward to the local bridge
 - bridge binding: localhost only
 - public bridge runtime: native Termux

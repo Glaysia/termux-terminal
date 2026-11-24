@@ -28,14 +28,15 @@ and GitHub release tag use `x.y.z` format without a `v` prefix.
 
 ## Validation
 
-Before a release, run:
+Before a release, install the Rust `aarch64-linux-android` target, set
+`ANDROID_NDK_HOME` to NDK r30, and run:
 
 ```bash
 pnpm run typecheck:plugin
 pnpm run build
 pnpm run check:release
 cargo test -p termux-bridge --test websocket_server -- --test-threads=1
-cargo build -p termux-bridge --target aarch64-unknown-linux-musl --release
+sh scripts/build-android-bridge.sh
 ```
 
 Also validate the Android Obsidian terminal with a hardware keyboard.
