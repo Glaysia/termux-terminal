@@ -6,6 +6,8 @@ shell, and process lifecycle.
 
 Korean: [README.ko.md](README.ko.md)
 
+![Opening Termux Terminal from the Obsidian command palette on Android](docs/assets/termux-terminal-demo-full-prompt.gif)
+
 ## Requirements
 
 - Android Obsidian with Community plugins enabled

@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "*.*.*"
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
   contents: write
@@ -22,27 +22,31 @@ jobs:
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-musl
-      - uses: mlugg/setup-zig@v2
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-zigbuild
+          targets: aarch64-linux-android
+      - name: Install Android NDK
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 3 https://dl.google.com/android/repository/android-ndk-r30-linux.zip -o android-ndk-r30-linux.zip
+          echo "5107f898313790e449e87eee2183d9a20602dee9  android-ndk-r30-linux.zip" | sha1sum -c -
+          unzip -q android-ndk-r30-linux.zip
+          echo "ANDROID_NDK_HOME=$RUNNER_TEMP/android-ndk-r30" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - name: Verify release tag
         run: |
           version="$(node -p "require('./manifest.json').version")"
           test "$GITHUB_REF_NAME" = "$version"
       - run: pnpm run check:release && pnpm run build:plugin
-      - run: cargo zigbuild -p termux-bridge --target aarch64-unknown-linux-musl --release
+      - run: sh scripts/build-android-bridge.sh
       - name: Assemble release assets
         run: |
           mkdir plugin-release bridge-release
           cp packages/obsidian-plugin/main.js plugin-release/main.js
           cp manifest.json plugin-release/manifest.json
           cp packages/obsidian-plugin/styles.css plugin-release/styles.css
-          cp target/aarch64-unknown-linux-musl/release/termux-bridge bridge-release/termux-bridge-aarch64-unknown-linux-musl
-          chmod 755 bridge-release/termux-bridge-aarch64-unknown-linux-musl
-          (cd bridge-release && sha256sum termux-bridge-aarch64-unknown-linux-musl > SHA256SUMS)
+          install -m755 target/aarch64-linux-android/release/termux-bridge bridge-release/termux-bridge-aarch64-linux-android
+          # Older installers expect this filename. Both assets contain the same Android PIE.
+          cp bridge-release/termux-bridge-aarch64-linux-android bridge-release/termux-bridge-aarch64-unknown-linux-musl
+          (cd bridge-release && sha256sum termux-bridge-aarch64-* > SHA256SUMS)
           (cd bridge-release && sha256sum -c SHA256SUMS)
       - name: Attest release assets
         uses: actions/attest@v4
@@ -51,6 +55,7 @@ jobs:
             plugin-release/main.js
             plugin-release/manifest.json
             plugin-release/styles.css
+            bridge-release/termux-bridge-aarch64-linux-android
             bridge-release/termux-bridge-aarch64-unknown-linux-musl
       - uses: softprops/action-gh-release@v2
         with:

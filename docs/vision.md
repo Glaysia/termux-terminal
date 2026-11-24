@@ -32,7 +32,7 @@ keyboard, without relying on Chrome or code-server input.
 
 ## Distribution
 
-- The bridge target is `aarch64-unknown-linux-musl`.
+- The bridge target is `aarch64-linux-android`.
 - The plugin release contains only Obsidian assets. The bridge binary and its
   checksum use a separate bridge release.
 - GitHub Actions publishes provenance attestations for release assets.

@@ -3,7 +3,7 @@
 set -eu
 
 repository="${TERMUX_TERMINAL_REPOSITORY:-Glaysia/termux-terminal}"
-asset="termux-bridge-aarch64-unknown-linux-musl"
+asset="termux-bridge-aarch64-linux-android"
 prefix="${PREFIX:-/data/data/com.termux/files/usr}"
 service_name="termux-terminal-bridge"
 service_dir="$prefix/var/service/$service_name"
@@ -23,17 +23,24 @@ fi
 pkg install -y curl openssl-tool runit termux-services
 bridge_tag="${TERMUX_TERMINAL_BRIDGE_TAG:-}"
 if [ -z "$bridge_tag" ]; then
-  bridge_tag="$(curl -fsSL "https://api.github.com/repos/$repository/releases?per_page=100" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\(bridge-[^"]*\)".*/\1/p' | head -n 1)"
+  bridge_tag="$(curl -fsSL "https://api.github.com/repos/$repository/releases?per_page=100" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\(bridge-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)".*/\1/p' | head -n 1)"
 fi
 if [ -z "$bridge_tag" ]; then
   echo "No bridge release was found for $repository." >&2
   exit 1
 fi
 release_base="https://github.com/$repository/releases/download/$bridge_tag"
-curl -fsSL "$release_base/$asset" -o "$temp_dir/$asset"
 curl -fsSL "$release_base/SHA256SUMS" -o "$temp_dir/SHA256SUMS"
+asset_listed() {
+  awk -v asset="$1" '$2 == asset { found = 1 } END { exit !found }' "$temp_dir/SHA256SUMS"
+}
+if ! asset_listed "$asset"; then
+  # Allow a pinned older stable bridge release.
+  asset="termux-bridge-aarch64-unknown-linux-musl"
+fi
+curl -fsSL "$release_base/$asset" -o "$temp_dir/$asset"
 
-(cd "$temp_dir" && grep "  $asset$" SHA256SUMS | sha256sum -c -)
+(cd "$temp_dir" && awk -v asset="$asset" '$2 == asset' SHA256SUMS | sha256sum -c -)
 install -Dm700 "$temp_dir/$asset" "$binary"
 
 token_file="$HOME/.termux_terminal_token"
@@ -78,7 +85,8 @@ while [ ! -p "$service_dir/supervise/ok" ] && [ "$attempt" -lt 10 ]; do
   attempt=$((attempt + 1))
 done
 
-if SVDIR="$SVDIR" sv up "$service_name"; then
+# Restart an existing service so upgrades take effect immediately.
+if SVDIR="$SVDIR" sv -w 10 restart "$service_name"; then
   printf '%s\n' "Installed and started $service_name." "Bridge token: $token" "Paste the token into Obsidian Settings > Termux Terminal."
 else
   printf '%s\n' "The service could not be started. Fully exit and reopen Termux, then run this installer again." >&2
