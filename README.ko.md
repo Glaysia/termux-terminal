@@ -6,7 +6,7 @@ Android Obsidian 안에서 네이티브 Termux의 실제 셸을 쓰는 플러그
 
 English: [README.md](README.md)
 
-![Android Obsidian 명령 팔레트에서 Termux 터미널 열기](docs/assets/termux-terminal-demo.gif)
+![Android Obsidian 명령 팔레트에서 Termux 터미널 열기](docs/assets/termux-terminal-demo-full-prompt.gif)
 
 ## 요구 사항
 
